@@ -1,0 +1,135 @@
+---
+title: "Building ByteChai: A Developer Portfolio Architecture Deep Dive"
+description: "An in-depth look at how I built ByteChai — the architecture, design decisions, and the modern web stack powering this portfolio."
+date: "2026-05-18"
+tags: ["Next.js", "Architecture", "TypeScript", "Portfolio", "Case Study"]
+author: "Mahesh Kakunuri"
+readingTime: "12 min read"
+published: true
+featuredImage: "/images/blog-architecture.png"
+---
+
+Every developer needs a portfolio. But not every portfolio is built with production-grade architecture. In this post, I'll walk through the technical decisions behind ByteChai.
+
+## The Architecture Goals
+
+When rebuilding ByteChai, I set clear objectives:
+
+- **Performance**: 90+ Lighthouse scores across all pages
+- **SEO**: Proper metadata, structured data, and semantic HTML
+- **Scalability**: Easy to add new features and content
+- **Developer Experience**: Clean code, reusable components, fast builds
+- **Content-First**: MDX-based blogging with full editorial control
+
+## Tech Stack
+
+```
+Framework:  Next.js 15 (App Router)
+Language:   TypeScript
+Styling:    Tailwind CSS v4
+Animation:  Framer Motion
+Content:    MDX with gray-matter
+Fonts:      Outfit + Space Grotesk
+Deployment: Vercel
+```
+
+## Project Structure
+
+The App Router dictates a file-system-based routing approach. Here's the high-level structure:
+
+```
+src/
+├── app/              # Routes and pages
+│   ├── layout.tsx    # Root layout with fonts and metadata
+│   ├── page.tsx      # Homepage
+│   ├── blog/         # Blog listing + dynamic [slug] pages
+│   └── about/        # About page
+├── components/       # Reusable UI components
+│   ├── ui/           # Primitive UI elements (Button, Card, Badge)
+│   ├── layout/       # Navbar, Footer, ReadingProgress
+│   ├── home/         # Homepage section components
+│   └── blog/         # Blog-specific components
+├── lib/              # Utilities and data fetching
+├── hooks/            # Custom React hooks
+├── types/            # TypeScript type definitions
+content/
+└── blogs/            # MDX blog post files
+```
+
+## Server Components vs Client Components
+
+One of the most important architectural decisions was choosing where to use server vs client components.
+
+```typescript
+// Server Component (default in App Router)
+// Handles data fetching, SEO metadata, and static content
+import { getAllBlogPosts } from '@/lib/mdx'
+
+export default function BlogPage() {
+  const posts = getAllBlogPosts() // Runs on server
+  return <BlogList posts={posts} />
+}
+```
+
+```typescript
+// Client Component (explicit 'use client')
+// Handles interactivity, animations, and state
+'use client'
+
+import { motion } from 'framer-motion'
+
+export function Hero() {
+  return <motion.div animate={{ opacity: 1 }}>
+    Interactive content here
+  </motion.div>
+}
+```
+
+The rule is simple: **use server components by default**. Only add `'use client'` when you need interactivity, browser APIs, or React hooks.
+
+## MDX Blog System
+
+Building a maintainable blog system was critical. Here's how it works:
+
+```typescript
+// lib/mdx.ts - The heart of the blog system
+import fs from 'fs'
+import path from 'path'
+import matter from 'gray-matter'
+
+export function getBlogPost(slug: string) {
+  const filePath = path.join(process.cwd(), 'content', 'blogs', `${slug}.mdx`)
+  const source = fs.readFileSync(filePath, 'utf-8')
+  const { data, content } = matter(source)
+  return { data, content, slug }
+}
+```
+
+Each MDX file has frontmatter for metadata, and the content is serialized using `next-mdx-remote` for rendering with customized components.
+
+## Performance Optimizations
+
+Several techniques were employed to ensure fast page loads:
+
+1. **Image optimization** with `next/image` for automatic WebP/AVIF conversion
+2. **Font optimization** with `next/font` for automatic subsetting and no layout shift
+3. **Code splitting** — automatic with Next.js App Router
+4. **Bundle optimization** — `optimizePackageImports` in `next.config.ts`
+5. **Static generation** — blog pages are pre-rendered at build time
+
+## Design System
+
+The design follows a "premium SaaS" aesthetic inspired by Vercel, Linear, and Stripe:
+
+- **Color**: Amber (#d97706) as primary, with warm neutral backgrounds
+- **Typography**: Outfit for body, Space Grotesk for headings
+- **Radius**: Generous border radii (2rem+) for modern feel
+- **Effects**: Subtle gradients, glassmorphism, and smooth transitions
+
+## Conclusion
+
+Building ByteChai with Next.js 15, TypeScript, and Tailwind CSS v4 has been a rewarding experience. The framework provides everything needed to build a modern, performant, and maintainable web application.
+
+The full source code is available on GitHub. Feel free to use it as inspiration for your own portfolio.
+
+**Key takeaway**: A well-architected portfolio isn't just a showcase of your work — it's a showcase of your technical capability. Make every line count.

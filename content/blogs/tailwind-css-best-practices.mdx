@@ -1,0 +1,198 @@
+---
+title: "Tailwind CSS Best Practices for Production Applications"
+description: "Advanced patterns and best practices for using Tailwind CSS v4 in production-grade applications."
+date: "2026-05-20"
+tags: ["Tailwind CSS", "CSS", "Frontend", "Best Practices", "Design"]
+author: "Mahesh Kakunuri"
+readingTime: "10 min read"
+published: true
+featuredImage: "/images/blog-tailwind.png"
+---
+
+Tailwind CSS has evolved significantly. With v4 now stable and deeply integrated with modern frameworks, it's time to revisit best practices for production use.
+
+## 1. Leverage the `@theme` Directive
+
+Tailwind CSS v4 introduces a new configuration approach using CSS-native `@theme` directives instead of the old `tailwind.config.js`:
+
+```css
+/* globals.css */
+@import "tailwindcss";
+
+@theme inline {
+  --color-chai: #d97706;
+  --color-chai-dark: #b45309;
+  --color-chai-light: #fef3c7;
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+}
+```
+
+This approach keeps your theme tokens in CSS, making them portable and easier to maintain.
+
+## 2. Extract Reusable Patterns with `cn()`
+
+Repeating long utility chains is a common pain point. Use `clsx` + `tailwind-merge` to create clean abstractions:
+
+```typescript
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+Now you can build component variants cleanly:
+
+```typescript
+function Card({ variant = 'default', className }: Props) {
+  return (
+    <div className={cn(
+      'rounded-2xl p-6 transition-all',
+      variant === 'elevated' && 'shadow-xl hover:shadow-2xl',
+      variant === 'bordered' && 'border border-gray-100',
+      className
+    )} />
+  )
+}
+```
+
+## 3. Responsive Design Patterns
+
+Mobile-first is the default in Tailwind. Design for mobile, then add larger breakpoints:
+
+```html
+<div class="
+  grid 
+  grid-cols-1           /* Mobile: single column */
+  sm:grid-cols-2        /* Tablet: two columns */
+  lg:grid-cols-3        /* Desktop: three columns */
+  xl:grid-cols-4        /* Wide: four columns */
+  gap-6                 /* Consistent spacing */
+">
+```
+
+**Pro tip**: Use consistent breakpoints across your entire application. Don't mix `sm`, `md`, `lg` haphazardly.
+
+## 4. Dark Mode Strategy
+
+Tailwind v4 supports dark mode via the `prefers-color-scheme` media query or class-based toggling:
+
+```css
+@theme inline {
+  --color-background: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0a0a0a;
+  }
+}
+```
+
+For a toggle-based approach, use the `class` strategy:
+
+```typescript
+// tailwind.config.js (v3 style) or @variant dark { ... } (v4)
+```
+
+## 5. Performance Considerations
+
+Tailwind generates only the CSS you use — that's the biggest performance win. But here are additional optimizations:
+
+```typescript
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'react-icons'],
+  },
+}
+```
+
+- **Purge unused styles**: Tailwind's JIT engine handles this automatically
+- **Avoid arbitrary values**: Use theme tokens instead of `w-[373px]` when possible
+- **Limit `@apply` usage**: It can create specificity issues and larger CSS bundles
+
+## 6. Component Patterns
+
+Here's my preferred pattern for Tailwind components:
+
+```typescript
+'use client'
+
+import { cn } from '@/lib/utils'
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  children: React.ReactNode
+}
+
+export function Button({ variant = 'primary', size = 'md', children, className }: ButtonProps) {
+  return (
+    <button className={cn(
+      'inline-flex items-center justify-center font-medium transition-all rounded-full',
+      {
+        'bg-chai text-white hover:bg-chai-dark': variant === 'primary',
+        'bg-white border border-gray-200 hover:border-chai': variant === 'secondary',
+        'bg-transparent text-chai hover:bg-chai/5': variant === 'ghost',
+      },
+      {
+        'px-4 py-2 text-sm': size === 'sm',
+        'px-6 py-3 text-base': size === 'md',
+        'px-10 py-4 text-lg': size === 'lg',
+      },
+      className
+    )}>
+      {children}
+    </button>
+  )
+}
+```
+
+## 7. Animating with Tailwind + Framer Motion
+
+Combine Tailwind's utility classes with Framer Motion for powerful animations:
+
+```typescript
+import { motion } from 'framer-motion'
+
+function AnimatedCard({ children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100"
+    >
+      {children}
+    </motion.div>
+  )
+}
+```
+
+## 8. Accessibility with Tailwind
+
+Don't sacrifice accessibility for aesthetics:
+
+```html
+<!-- Always include focus rings -->
+<button class="focus:outline-none focus:ring-2 focus:ring-chai/50 rounded-full">
+  Click Me
+</button>
+
+<!-- Respect reduced motion -->
+<style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+  }
+}
+</style>
+```
+
+## Conclusion
+
+Tailwind CSS v4 is a massive step forward. The CSS-first configuration, improved performance, and deeper framework integration make it the best choice for styling modern web applications in 2026.
+
+**Remember**: Great styling isn't about memorizing class names — it's about building a consistent, maintainable system that scales with your application.
