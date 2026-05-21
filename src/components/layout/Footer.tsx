@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FaTwitter, FaLinkedin, FaGithub, FaInstagram, FaHeart } from 'react-icons/fa'
+import { FaLinkedin, FaGithub, FaHeart } from 'react-icons/fa'
 import { FaCode } from 'react-icons/fa'
 import { socialLinks } from '@/lib/site'
 
@@ -34,7 +34,7 @@ export function Footer() {
     },
   ]
 
-  const icons = [FaGithub, FaTwitter, FaLinkedin, FaInstagram]
+  const icons = [FaGithub, FaLinkedin]
 
   return (
     <footer className="bg-white border-t border-gray-100 pt-24 pb-12 px-6">

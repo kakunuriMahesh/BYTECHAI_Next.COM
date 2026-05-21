@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { HiOutlineMail, HiOutlinePhone, HiOutlineLocationMarker, HiChevronRight } from 'react-icons/hi'
-import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa'
+import { FaGithub, FaLinkedin } from 'react-icons/fa'
 import { contactInfo } from '@/lib/site'
 
 export default function ContactPage() {
@@ -59,9 +59,8 @@ export default function ContactPage() {
             <h3 className="font-bold text-sm text-gray-400 uppercase tracking-widest mb-4">Find Me Online</h3>
             <div className="flex gap-4">
               {[
-                { icon: FaGithub, label: 'GitHub', href: 'https://github.com/maheshkakunuri' },
-                { icon: FaLinkedin, label: 'LinkedIn', href: 'https://linkedin.com/in/maheshkakunuri' },
-                { icon: FaTwitter, label: 'Twitter', href: 'https://twitter.com' },
+                { icon: FaGithub, label: 'GitHub', href: 'https://github.com/kakunuriMahesh' },
+                { icon: FaLinkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/maheshkakunuri' },
               ].map(({ icon: Icon, label, href }) => (
                 <a
                   key={label}

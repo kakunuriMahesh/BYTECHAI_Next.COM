@@ -6,10 +6,8 @@ export const siteConfig: SiteConfig = {
   url: 'https://bytechai.com',
   ogImage: '/images/og-default.png',
   links: {
-    github: 'https://github.com/bytechai',
-    twitter: 'https://twitter.com/bytechai',
-    linkedin: 'https://linkedin.com/company/bytechai',
-    instagram: 'https://instagram.com/bytechai',
+    github: 'https://github.com/kakunuriMahesh',
+    linkedin: 'https://www.linkedin.com/in/maheshkakunuri',
   },
 }
 
@@ -23,10 +21,8 @@ export const navLinks: NavLink[] = [
 ]
 
 export const socialLinks: SocialLink[] = [
-  { name: 'GitHub', url: 'https://github.com', icon: 'FaGithub' },
-  { name: 'Twitter', url: 'https://twitter.com', icon: 'FaTwitter' },
-  { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'FaLinkedin' },
-  { name: 'Instagram', url: 'https://instagram.com', icon: 'FaInstagram' },
+  { name: 'GitHub', url: 'https://github.com/kakunuriMahesh', icon: 'FaGithub' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/in/maheshkakunuri', icon: 'FaLinkedin' },
 ]
 
 export const stats = [

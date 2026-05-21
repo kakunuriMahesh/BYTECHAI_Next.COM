@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { constructMetadata } from '@/lib/seo'
-import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa'
 
 export const metadata: Metadata = constructMetadata({
   title: 'About',
@@ -50,13 +50,10 @@ export default function AboutPage() {
               </Link>
             </div>
             <div className="flex gap-4 mt-8">
-              <a href="https://github.com/maheshkakunuri" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-chai transition-colors" aria-label="GitHub">
+              <a href="https://github.com/kakunuriMahesh" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-chai transition-colors" aria-label="GitHub">
                 <FaGithub size={22} />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-chai transition-colors" aria-label="Twitter">
-                <FaTwitter size={22} />
-              </a>
-              <a href="https://linkedin.com/in/maheshkakunuri" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-chai transition-colors" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/in/maheshkakunuri" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-chai transition-colors" aria-label="LinkedIn">
                 <FaLinkedin size={22} />
               </a>
               <a href="mailto:maheshkakunuri3@gmail.com" className="text-gray-400 hover:text-chai transition-colors" aria-label="Email">
