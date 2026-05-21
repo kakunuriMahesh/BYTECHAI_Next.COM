@@ -13,12 +13,14 @@ export function TableOfContents() {
   const [activeId, setActiveId] = useState<string>('')
 
   useEffect(() => {
-    const elements = document.querySelectorAll('h2, h3')
-    const items: TOCItem[] = Array.from(elements).map((el) => ({
-      id: el.id,
-      text: el.textContent || '',
-      level: el.tagName === 'H2' ? 2 : 3,
-    }))
+    const elements = document.querySelectorAll<HTMLHeadingElement>('h2, h3')
+    const items: TOCItem[] = Array.from(elements)
+      .filter((el) => el.id)
+      .map((el) => ({
+        id: el.id,
+        text: el.textContent || '',
+        level: el.tagName === 'H2' ? 2 : 3,
+      }))
     setHeadings(items)
 
     const observer = new IntersectionObserver(
@@ -30,7 +32,9 @@ export function TableOfContents() {
       { rootMargin: '-80px 0px -80% 0px' }
     )
 
-    elements.forEach((el) => observer.observe(el))
+    elements.forEach((el) => {
+      if (el.id) observer.observe(el)
+    })
     return () => observer.disconnect()
   }, [])
 

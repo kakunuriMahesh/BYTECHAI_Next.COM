@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { compileMDX } from 'next-mdx-remote/rsc'
+import rehypeHighlight from 'rehype-highlight'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import remarkGfm from 'remark-gfm'
 import { constructMetadata } from '@/lib/seo'
 import { getBlogPost, getRelatedPosts, getBlogSlugs } from '@/lib/mdx'
 import { formatDate } from '@/lib/utils'
-import { BlogMDXContent } from './BlogMDXContent'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { ReadingProgress } from '@/components/layout/ReadingProgress'
 import { FaClock, FaTag, FaUser } from 'react-icons/fa'
@@ -12,6 +16,48 @@ import { AdPlaceholder } from '@/components/shared/AdPlaceholder'
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
+}
+
+const mdxComponents = {
+  h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2 className="text-2xl sm:text-3xl font-bold mt-12 mb-4 scroll-mt-24" {...props} />
+  ),
+  h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h3 className="text-xl sm:text-2xl font-bold mt-8 mb-3 scroll-mt-24" {...props} />
+  ),
+  p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
+    <p className="text-gray-700 leading-relaxed mb-6 text-lg" {...props} />
+  ),
+  ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
+    <ul className="list-disc pl-6 mb-6 space-y-2 text-gray-700" {...props} />
+  ),
+  ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
+    <ol className="list-decimal pl-6 mb-6 space-y-2 text-gray-700" {...props} />
+  ),
+  li: (props: React.HTMLAttributes<HTMLLIElement>) => (
+    <li className="text-gray-700 leading-relaxed" {...props} />
+  ),
+  blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
+    <blockquote className="border-l-4 border-chai pl-6 italic text-gray-600 mb-6 bg-amber-50/50 py-4 pr-4 rounded-r-2xl" {...props} />
+  ),
+  a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a className="text-chai hover:text-chai-dark underline underline-offset-2" {...props} />
+  ),
+  pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
+    <pre className="bg-[#1e1e2e] text-[#cdd6f4] rounded-2xl p-6 mb-6 overflow-x-auto text-sm leading-relaxed" {...props} />
+  ),
+  code: (props: React.HTMLAttributes<HTMLElement>) => {
+    const className = (props as { className?: string }).className
+    const isInline = !className || className === ''
+    if (isInline) {
+      return <code className="bg-chai-light text-chai px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+    }
+    return <code className="text-sm leading-relaxed" {...props} />
+  },
+  img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img className="rounded-2xl w-full mb-6" loading="lazy" {...props} />
+  ),
+  hr: () => <hr className="my-12 border-gray-100" />,
 }
 
 export async function generateStaticParams() {
@@ -37,6 +83,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
   const post = getBlogPost(slug)
   if (!post) notFound()
+
+  const { content } = await compileMDX({
+    source: post.content,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [
+          rehypeSlug,
+          [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+          rehypeHighlight,
+        ],
+      },
+    },
+    components: mdxComponents,
+  })
 
   const related = getRelatedPosts(slug, post.data.tags)
 
@@ -82,8 +143,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <AdPlaceholder size="banner" className="mb-12" />
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12">
-            <div className="prose prose-lg max-w-none">
-              <BlogMDXContent source={post.content} />
+            <div className="min-w-0">
+              {content}
             </div>
 
             <aside className="hidden lg:block">
