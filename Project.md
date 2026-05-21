@@ -98,6 +98,7 @@ Text:               #1f2937 (gray-800)
 - `Badge` – 4 variants (default, success, info, warning)
 - `Input` – Styled input with optional label
 - `SectionHeading` – Reusable section header with label/title/description
+- `BlogList` – Client-side blog search + filter (real-time filtering by title, description, tags)
 - `AdPlaceholder` – Banner, rectangle, and skyscraper ad slots
 - `Chatbot` – Floating chat widget with auto-responses
 
@@ -221,7 +222,7 @@ D:\BYTECHAI_NEXT\
 │   │   ├── terms-and-conditions/page.tsx
 │   │   └── disclaimer/page.tsx
 │   ├── components/
-│   │   ├── blog/               # BlogCard, SearchBlogs, TableOfContents
+│   │   ├── blog/               # BlogCard, BlogList, TableOfContents
 │   │   ├── home/               # Hero, Stats, TechStack, FeaturedProjects, etc.
 │   │   ├── layout/             # Navbar, Footer, ReadingProgress
 │   │   ├── shared/             # Chatbot, AdPlaceholder, SectionHeading

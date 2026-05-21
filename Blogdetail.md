@@ -102,27 +102,33 @@ const greeting = "Hello ByteChai!";
   └──────────┬───────────────────────┘
              │
              ▼
-  ┌──────────────────────────────────┐
-  │  4. MDX Serialization            │
-  │  BlogMDXContent component        │
-  │  - serialize() with plugins:     │
-  │    • remark-gfm                  │
-  │    • rehype-slug                 │
-  │    • rehype-autolink-headings    │
-  │    • rehype-highlight            │
-  └──────────┬───────────────────────┘
-             │
-             ▼
-  ┌──────────────────────────────────┐
-  │  5. Render with Components       │
-  │  MDXRemote() with custom         │
-  │  component mapping for:          │
-  │  h2, h3, p, ul, ol, blockquote,  │
-  │  pre, code, img, a, hr           │
-  └──────────┬───────────────────────┘
-             │
-             ▼
-        STATIC HTML OUTPUT
+   ┌──────────────────────────────────┐
+   │  4. MDX Compilation (Server)     │
+   │  compileMDX() from               │
+   │  next-mdx-remote/rsc             │
+   │  - Compiles + renders MDX to     │
+   │    React elements on the server  │
+   │  - Plugins applied during        │
+   │    compilation:                  │
+   │    • remark-gfm                  │
+   │    • rehype-slug                 │
+   │    • rehype-autolink-headings    │
+   │    • rehype-highlight            │
+   │  - No client-side serialization  │
+   └──────────┬───────────────────────┘
+              │
+              ▼
+   ┌──────────────────────────────────┐
+   │  5. Render RSC React Element     │
+   │  {content} from compileMDX()     │
+   │  inserted directly into JSX      │
+   │  with custom component mapping:  │
+   │  h2, h3, p, ul, ol, blockquote,  │
+   │  pre, code, img, a, hr           │
+   └──────────┬───────────────────────┘
+              │
+              ▼
+         STATIC HTML OUTPUT (SSG)
 ```
 
 ---
@@ -173,8 +179,8 @@ function getRelatedPosts(
 ): (BlogPost & { slug: string })[]
 ```
 
-#### `searchBlogs(query)`
-Performs case-insensitive search across title, description, and tags.
+#### `searchBlogs(query)` (deprecated in favor of client-side filtering)
+Performs case-insensitive search across title, description, and tags. Available for server-side use but the current UI uses `BlogList.tsx` client-side filtering instead.
 
 ```typescript
 function searchBlogs(query: string): (BlogPost & { slug: string })[]
@@ -195,7 +201,7 @@ src/app/blog/page.tsx
 │  SectionHeading                  │
 │  "Blog / Latest Articles"        │
 ├──────────────────────────────────┤
-│  SearchBlogs (Client)            │
+│  BlogList (Client - filtering)   │
 │  ┌──────────────────────────┐    │
 │  │ 🔍 Search articles...    │    │
 │  └──────────────────────────┘    │
@@ -213,14 +219,12 @@ src/app/blog/page.tsx
 ```
 
 - Server component that fetches all posts via `getAllBlogPosts()`
-- Renders `BlogCard` for each post
-- `SearchBlogs` is a client component for interactivity
+- Passes posts to `BlogList` (client component) which handles search/filter and rendering
 
 ### Single Blog Post (`/blog/[slug]` — SSG with `generateStaticParams`)
 
 ```
 src/app/blog/[slug]/page.tsx
-src/app/blog/[slug]/BlogMDXContent.tsx  (client component)
 ```
 
 ```
@@ -237,8 +241,8 @@ src/app/blog/[slug]/BlogMDXContent.tsx  (client component)
 ├──────────────────┬──────────────────────┤
 │  MDX Content     │  TableOfContents     │
 │  (rendered via   │  (sticky sidebar)    │
-│   next-mdx-      │  - Auto-generated    │
-│   remote)        │    from h2/h3        │
+│   compileMDX     │  - Auto-generated    │
+│   from RSC)      │    from h2/h3        │
 │                  │  - Intersection      │
 │                  │    Observer for      │
 │                  │    active state      │
@@ -257,47 +261,103 @@ src/app/blog/[slug]/BlogMDXContent.tsx  (client component)
 - `generateMetadata()` creates per-post SEO metadata from frontmatter
 - `ReadingProgress` tracks scroll position
 - `TableOfContents` observes headings for active highlighting
-- `BlogMDXContent` serializes MDX at runtime with full plugin pipeline
+- `compileMDX()` from `next-mdx-remote/rsc` compiles MDX entirely on the server — no client-side serialization needed
 
 ---
 
-## 5. MDX Rendering Pipeline (`BlogMDXContent.tsx`)
+## 5. MDX Rendering Pipeline (`compileMDX` from `next-mdx-remote/rsc`) — Server-Only
 
-This is a **client component** because it uses `useEffect`/`useState` to serialize MDX content:
+> **Important Design Decision**: Unlike the initial implementation which used `serialize()` on the server + `MDXRemote` on the client (requiring a separate `BlogMDXContent` client component), the final architecture uses `compileMDX` from `next-mdx-remote/rsc` **entirely on the server**. This eliminates client-side serialization overhead, reduces JavaScript bundle size, and avoids runtime errors like `Cannot read properties of null (reading 'useState')` that occur when `MDXRemote` tries to hydrate compiled MDX in the browser during prerendering.
+
+The blog post page (`src/app/blog/[slug]/page.tsx`) is a **Server Component** that handles everything:
 
 ```typescript
-'use client'
-
-import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
+import { compileMDX } from 'next-mdx-remote/rsc'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import remarkGfm from 'remark-gfm'
+
+export default async function BlogPostPage({ params }) {
+  const { slug } = await params
+  const post = getBlogPost(slug)
+  
+  // compileMDX compiles and renders MDX to React elements on the server
+  const { content } = await compileMDX({
+    source: post.content,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [
+          rehypeSlug,                      // Adds IDs to headings
+          [rehypeAutolinkHeadings, { behavior: 'wrap' }],  // Anchor links
+          rehypeHighlight,                 // Syntax highlighting
+        ],
+      },
+    },
+    components: customComponents,   // Custom component mapping
+  })
+
+  // content is a React element — just render it in JSX
+  return <article>{content}</article>
+}
 ```
+
+### Why Server-Only Rendering?
+
+| Approach | Previous (Client serialize) | Current (Server compileMDX) |
+|----------|----------------------------|----------------------------|
+| Where MDX compiles | Browser (useEffect) | Server (build/request time) |
+| Bundle size | Includes MDX compiler (~200KB) | No MDX compiler in browser |
+| Error handling | Runtime hydration errors | Compile-time errors |
+| SEO | Fully rendered (SSG) | Fully rendered (SSG) |
+| Code complexity | 2 files (page + client component) | 1 file (server component) |
 
 ### Plugins
 
 | Plugin | Purpose |
 |--------|---------|
 | `remark-gfm` | GitHub Flavored Markdown (tables, strikethrough, task lists) |
-| `rehype-slug` | Adds `id` attributes to headings (`#user-content-`) |
+| `rehype-slug` | Adds `id` attributes to headings for TOC linking |
 | `rehype-autolink-headings` | Adds clickable anchor links to headings |
-| `rehype-highlight` | Syntax highlighting for code blocks |
+| `rehype-highlight` | Syntax highlighting for code blocks (uses `lowlight` under the hood) |
+
+### Syntax Highlighting CSS
+
+`highlight.js` must be installed and its CSS imported for code highlighting to be visible:
+
+```css
+/* In src/app/globals.css */
+@import "highlight.js/styles/atom-one-dark.css";
+```
 
 ### Custom Component Mapping
 
+Components are defined as a plain object in the server component and passed to `compileMDX()`:
+
 ```typescript
-const components = {
-  h2: styled heading with scroll-margin for TOC offset
-  h3: smaller heading variant
-  p:  large, readable body text
-  ul/ol: proper list styling
-  blockquote: left border with amber accent
-  pre: dark background code container
-  code: inline = amber badge, block = dark theme
-  img: rounded, lazy-loaded
-  a:  colored link with underline
+const mdxComponents = {
+  h2: (props) => <h2 className="text-2xl sm:text-3xl font-bold mt-12 mb-4 scroll-mt-24" {...props} />,
+  h3: (props) => <h3 className="text-xl sm:text-2xl font-bold mt-8 mb-3 scroll-mt-24" {...props} />,
+  p:  (props) => <p className="text-gray-700 leading-relaxed mb-6 text-lg" {...props} />,
+  ul: (props) => <ul className="list-disc pl-6 mb-6 space-y-2 text-gray-700" {...props} />,
+  ol: (props) => <ol className="list-decimal pl-6 mb-6 space-y-2 text-gray-700" {...props} />,
+  blockquote: (props) => <blockquote className="border-l-4 border-chai pl-6 italic text-gray-600 mb-6 bg-amber-50/50 py-4 pr-4 rounded-r-2xl" {...props} />,
+  a:  (props) => <a className="text-chai hover:text-chai-dark underline underline-offset-2" {...props} />,
+  pre: (props) => <pre className="bg-[#1e1e2e] text-[#cdd6f4] rounded-2xl p-6 mb-6 overflow-x-auto text-sm leading-relaxed" {...props} />,
+  code: (props) => {
+    // Distinguish inline code from fenced code blocks
+    // - Inline: no className → amber badge
+    // - Block: has language class → dark theme
+    const className = (props as { className?: string }).className
+    const isInline = !className || className === ''
+    if (isInline) {
+      return <code className="bg-chai-light text-chai px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+    }
+    return <code className="text-sm leading-relaxed" {...props} />
+  },
+  img: (props) => <img className="rounded-2xl w-full mb-6" loading="lazy" {...props} />,
+  hr:  () => <hr className="my-12 border-gray-100" />,
 }
 ```
 
@@ -321,9 +381,17 @@ const components = {
 ```
 
 - Automatically collects all `h2` and `h3` elements from the rendered article
+- Filters out headings without `id` attributes (avoids React key conflict `""` errors)
 - Uses `IntersectionObserver` with `rootMargin: '-80px 0px -80% 0px'`
 - Active heading gets visual indicator (amber text)
 - Clicking scrolls smoothly to the heading (offset by navbar height)
+
+```typescript
+// Filter ensures no empty-string keys
+const items: TOCItem[] = Array.from(elements)
+  .filter((el) => el.id)   // Skip headings without IDs
+  .map((el) => ({ id: el.id, text: el.textContent || '', level: ... }))
+```
 
 ### Reading Progress Bar (`ReadingProgress.tsx`)
 
@@ -339,7 +407,7 @@ const components = {
 - Color: `bg-chai` (#d97706)
 - Height: 2px
 
-### Search (`SearchBlogs.tsx`)
+### Search (`BlogList.tsx`)
 
 ```
 ┌──────────────────────────────────────────┐
@@ -347,9 +415,33 @@ const components = {
 └──────────────────────────────────────────┘
 ```
 
-- Redirects to `/blog?search=query` on submit
-- Client-side processing via `searchBlogs()` function
-- Real-time filtering across title, description, and tags
+- **Replaced `SearchBlogs.tsx`** (which only navigated to `?search=query` without the page reading the param)
+- Uses local `useState` for the search query and `useMemo` for real-time filtering
+- Filters by title, description, and tags — instant feedback as the user types
+- No page navigation needed — search state is local to the component
+
+```typescript
+'use client'
+
+import { useState, useMemo } from 'react'
+
+export function BlogList({ posts }: { posts: (BlogPost & { slug: string })[] }) {
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return posts
+    const q = query.toLowerCase()
+    return posts.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.tags.some((t) => t.toLowerCase().includes(q))
+    )
+  }, [query, posts])
+
+  // Renders filtered results with BlogCard components
+}
+```
 
 ### Related Posts
 
@@ -479,13 +571,19 @@ const blogPosts = getAllBlogPosts().map((post) => ({
 
 | File | Purpose |
 |------|---------|
-| `content/blogs/*.mdx` | Blog post source files |
-| `src/lib/mdx.ts` | Server-side blog data functions |
-| `src/app/blog/page.tsx` | Blog listing page (server) |
-| `src/app/blog/[slug]/page.tsx` | Single post page with metadata + layout (server) |
-| `src/app/blog/[slug]/BlogMDXContent.tsx` | MDX rendering with plugins (client) |
+| `content/blogs/*.mdx` | Blog post source files (frontmatter + MDX body) |
+| `src/lib/mdx.ts` | Server-side blog data functions (get, search, relate) |
+| `src/app/blog/page.tsx` | Blog listing page (server — fetches all posts) |
+| `src/app/blog/[slug]/page.tsx` | Single post page with full server-side MDX compilation |
+| `src/components/blog/BlogList.tsx` | Client component for search filtering + blog grid |
 | `src/components/blog/BlogCard.tsx` | Blog preview card component |
-| `src/components/blog/SearchBlogs.tsx` | Blog search component |
-| `src/components/blog/TableOfContents.tsx` | Auto-generated TOC sidebar |
+| `src/components/blog/TableOfContents.tsx` | Auto-generated TOC sidebar (filters empty IDs) |
 | `src/components/layout/ReadingProgress.tsx` | Scroll progress bar |
 | `src/app/sitemap.ts` | Sitemap including blog URLs |
+
+### Key Files Removed During Refactoring
+
+| Removed File | Reason |
+|-------------|--------|
+| `src/app/blog/[slug]/BlogMDXContent.tsx` | Replaced by server-only `compileMDX()` — no client serialization needed |
+| `src/components/blog/SearchBlogs.tsx` | Replaced by `BlogList.tsx` which handles both search and rendering with local state |
