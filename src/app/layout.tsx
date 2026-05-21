@@ -31,6 +31,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  icons: {
+    icon: '/images/bytechai-logo.png',
+    shortcut: '/images/bytechai-logo.png',
+    apple: '/images/bytechai-logo.png',
+  },
   openGraph: {
     title: `${siteConfig.name} - Developer Portfolio & Technical Blog`,
     description: siteConfig.description,
