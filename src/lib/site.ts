@@ -3,7 +3,7 @@ import type { NavLink, SocialLink, SiteConfig, Project, Testimonial, Service } f
 export const siteConfig: SiteConfig = {
   name: 'ByteChai',
   description: 'Where technology meets creativity. We brew high-performance digital solutions with a human touch.',
-  url: 'https://bytechai.vercel.app',
+  url: 'https://bytechai.com',
   ogImage: '/images/og-default.png',
   links: {
     github: 'https://github.com/bytechai',

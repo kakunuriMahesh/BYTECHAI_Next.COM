@@ -30,5 +30,5 @@ export function slugify(text: string) {
 }
 
 export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bytechai.vercel.app'}${path}`
+  return `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bytechai.com'}${path}`
 }

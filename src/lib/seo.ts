@@ -28,7 +28,7 @@ export function constructMetadata({
   return {
     title,
     description,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bytechai.vercel.app'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bytechai.com'),
     alternates: {
       canonical: canonical || url,
     },

@@ -486,7 +486,7 @@ This generates:
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2026-05-15">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://bytechai.vercel.app/blog/react-vs-nextjs">
+<link rel="canonical" href="https://bytechai.com/blog/react-vs-nextjs">
 ```
 
 ### JSON-LD Structured Data
