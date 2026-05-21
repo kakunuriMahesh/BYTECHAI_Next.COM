@@ -1,0 +1,270 @@
+---
+title: "TypeScript Patterns Every React Developer Should Master"
+description: "Advanced TypeScript patterns for React applications — from generics and discriminated unions to template literals and type guards."
+date: "2026-05-30"
+tags: ["TypeScript", "React", "JavaScript", "Type Safety", "Best Practices"]
+author: "Mahesh Kakunuri"
+readingTime: "11 min read"
+published: true
+---
+
+TypeScript and React are a powerful combination. But moving beyond basic prop types to advanced patterns can dramatically improve your code quality and developer experience.
+
+Here are the TypeScript patterns I use daily in production React applications.
+
+## 1. Generic Components
+
+Generics allow components to work with any type while maintaining type safety:
+
+```typescript
+interface ListProps<T> {
+  items: T[]
+  renderItem: (item: T) => React.ReactNode
+  keyExtractor: (item: T) => string
+}
+
+function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={keyExtractor(item)}>{renderItem(item)}</li>
+      ))}
+    </ul>
+  )
+}
+
+// Usage — types are inferred automatically
+const UserList = () => (
+  <List
+    items={[
+      { id: '1', name: 'Alice' },
+      { id: '2', name: 'Bob' },
+    ]}
+    renderItem={(user) => <span>{user.name}</span>}
+    keyExtractor={(user) => user.id}
+  />
+)
+```
+
+TypeScript infers `T` as `{ id: string; name: string }` from the usage. No explicit type annotation needed.
+
+## 2. Discriminated Unions for State Management
+
+Instead of boolean flags, use discriminated unions to represent mutually exclusive states:
+
+```typescript
+type AsyncState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string }
+
+function useAsync<T>(
+  fetcher: () => Promise<T>
+): AsyncState<T> & { refetch: () => void } {
+  const [state, setState] = useState<AsyncState<T>>({ status: 'idle' })
+
+  const fetch = useCallback(async () => {
+    setState({ status: 'loading' })
+    try {
+      const data = await fetcher()
+      setState({ status: 'success', data })
+    } catch (error) {
+      setState({ status: 'error', error: String(error) })
+    }
+  }, [fetcher])
+
+  return { ...state, refetch: fetch } as AsyncState<T> & { refetch: () => void }
+}
+
+// Usage — exhaustive switch ensures all cases handled
+function UserProfile({ userId }: { userId: string }) {
+  const state = useAsync(() => fetchUser(userId))
+
+  switch (state.status) {
+    case 'idle':
+    case 'loading':
+      return <Spinner />
+    case 'success':
+      return <UserCard user={state.data} />
+    case 'error':
+      return <ErrorBanner message={state.error} />
+  }
+}
+```
+
+**Why this matters**: You can't access `state.data` unless you've checked `state.status === 'success'`. TypeScript enforces this at compile time.
+
+## 3. Template Literal Types
+
+Create precise string types from unions:
+
+```typescript
+type Size = 'sm' | 'md' | 'lg'
+type Variant = 'primary' | 'secondary' | 'ghost'
+
+// Generates: "primary-sm" | "primary-md" | "primary-lg" | ...
+type CompoundVariant = `${Variant}-${Size}`
+
+// More practical: event handlers
+type EventName = 'click' | 'focus' | 'blur' | 'change'
+type ElementType = 'button' | 'input' | 'select'
+
+type EventHandler = `on${Capitalize<EventName>}${Capitalize<ElementType>}`
+// Generates: "onClickButton" | "onFocusButton" | ...
+```
+
+## 4. The `satisfies` Operator
+
+Use `satisfies` to validate types without widening:
+
+```typescript
+const palette = {
+  primary: '#d97706',
+  secondary: '#6b7280',
+  error: '#ef4444',
+} satisfies Record<string, `#${string}`>
+
+// Type of palette is still the narrow object type
+// But values are validated to match `#${string}` (hex colors)
+
+const color = palette.primary
+//    ^? type: "#d97706" (literal, not string)
+```
+
+Without `satisfies`, using `Record<string, string>` would widen all values to `string`.
+
+## 5. Conditional Types for Props
+
+Create prop types that depend on other props:
+
+```typescript
+type ButtonProps =
+  | { variant: 'primary'; children: React.ReactNode }
+  | { variant: 'icon'; icon: React.ReactNode; label: string }
+
+function Button(props: ButtonProps) {
+  if (props.variant === 'icon') {
+    return <button aria-label={props.label}>{props.icon}</button>
+  }
+  return <button className="bg-chai text-white">{props.children}</button>
+}
+
+// Error: Property 'children' does not exist on type '{ variant: 'icon'; ... }'
+<Button variant="icon" icon={<FaStar />} children="Click" />
+
+// Correct:
+<Button variant="icon" icon={<FaStar />} label="Favorite" />
+```
+
+## 6. Type Guards for Runtime Safety
+
+```typescript
+interface User {
+  id: string
+  email: string
+  name: string
+}
+
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    'email' in value &&
+    'name' in value
+  )
+}
+
+// Usage in API responses
+async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`)
+  const data = await response.json()
+
+  if (!isUser(data)) {
+    throw new Error('Invalid user data received')
+  }
+
+  return data // TypeScript knows this is User
+}
+```
+
+## 7. The `as const` Pattern
+
+Use `as const` for literal types in arrays and objects:
+
+```typescript
+export const THEMES = [
+  { id: 'light', label: 'Light' },
+  { id: 'dark', label: 'Dark' },
+  { id: 'system', label: 'System' },
+] as const
+
+// Type is readonly array of literal objects
+type ThemeId = (typeof THEMES)[number]['id']
+//    ^? "light" | "dark" | "system"
+
+type ThemeLabel = (typeof THEMES)[number]['label']
+//    ^? "Light" | "Dark" | "System"
+```
+
+This is incredibly useful for maintaining a single source of truth for configuration.
+
+## 8. Extracting Component Props
+
+```typescript
+import { Button } from './Button'
+
+// Get the props type of any component
+type ButtonProps = React.ComponentProps<typeof Button>
+
+// Extract specific prop types
+type ButtonVariant = ButtonProps['variant']
+type ButtonSize = ButtonProps['size']
+```
+
+## Putting It All Together
+
+Here's a production component using multiple patterns:
+
+```typescript
+type AsyncButtonProps<T extends 'default' | 'confirm'> = {
+  action: T
+  onAction: () => Promise<void>
+} & (T extends 'confirm'
+  ? { confirmMessage: string; confirmText: string }
+  : { children: React.ReactNode })
+
+function AsyncButton<T extends 'default' | 'confirm'>(
+  props: AsyncButtonProps<T>
+) {
+  const [state, setState] = useState<AsyncState<void>>({ status: 'idle' })
+
+  const handleClick = async () => {
+    setState({ status: 'loading' })
+    try {
+      await props.onAction()
+      setState({ status: 'success', data: undefined })
+    } catch (error) {
+      setState({ status: 'error', error: String(error) })
+    }
+  }
+
+  return (
+    <button onClick={handleClick} disabled={state.status === 'loading'}>
+      {state.status === 'loading' ? 'Processing...' : props.children}
+    </button>
+  )
+}
+```
+
+## Conclusion
+
+These TypeScript patterns have transformed how I write React components. The key benefits are:
+
+- **Compile-time safety**: Catch errors before they reach production
+- **Self-documenting code**: Types serve as living documentation
+- **Better IDE support**: Autocomplete and inline errors speed up development
+- **Refactoring confidence**: TypeScript catches breaking changes instantly
+
+Start with discriminated unions and generic components — they'll give you the most value for the least complexity. As you get comfortable, incorporate the more advanced patterns.

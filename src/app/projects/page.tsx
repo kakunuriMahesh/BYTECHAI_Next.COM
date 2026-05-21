@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaExternalLinkAlt, FaGithub, FaCube, FaTimes, FaCode, FaCommentAlt } from 'react-icons/fa'
+import { FaExternalLinkAlt, FaGithub, FaCube, FaTimes, FaCode, FaCommentAlt, FaCheckCircle } from 'react-icons/fa'
 import { SectionHeading } from '@/components/shared/SectionHeading'
 import { Badge } from '@/components/ui/badge'
 import { featuredProjects } from '@/lib/site'
@@ -138,6 +138,34 @@ export default function ProjectsPage() {
                     <p className="text-xs italic text-gray-500">&ldquo;{selectedProject.clientFeedback}&rdquo;</p>
                   </div>
                 </div>
+
+                {selectedProject.challenge && (
+                  <div className="mb-8">
+                    <h5 className="font-bold mb-3 text-lg">The Challenge</h5>
+                    <p className="text-gray-600 leading-relaxed">{selectedProject.challenge}</p>
+                  </div>
+                )}
+
+                {selectedProject.solution && (
+                  <div className="mb-8">
+                    <h5 className="font-bold mb-3 text-lg">The Solution</h5>
+                    <p className="text-gray-600 leading-relaxed">{selectedProject.solution}</p>
+                  </div>
+                )}
+
+                {selectedProject.results && selectedProject.results.length > 0 && (
+                  <div className="mb-10 bg-green-50 p-6 rounded-2xl border border-green-100">
+                    <h5 className="font-bold mb-3 text-green-800">Results</h5>
+                    <ul className="space-y-2">
+                      {selectedProject.results.map((r, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-green-700">
+                          <FaCheckCircle className="mt-0.5 flex-shrink-0" size={14} />
+                          {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <div className="flex gap-4">
                   <a

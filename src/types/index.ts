@@ -9,6 +9,9 @@ export interface Project {
   images: string[]
   github?: string
   live?: string
+  challenge?: string
+  solution?: string
+  results?: string[]
 }
 
 export interface BlogPost {

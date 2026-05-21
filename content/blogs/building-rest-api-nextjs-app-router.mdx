@@ -1,0 +1,276 @@
+---
+title: "How to Build a REST API with Next.js App Router"
+description: "A step-by-step guide to building type-safe REST APIs using Next.js Route Handlers, Prisma, and PostgreSQL — from setup to deployment."
+date: "2026-05-28"
+tags: ["Next.js", "API", "Backend", "TypeScript", "Prisma"]
+author: "Mahesh Kakunuri"
+readingTime: "10 min read"
+published: true
+---
+
+Next.js isn't just a frontend framework. With the App Router's Route Handlers, you can build full-featured REST APIs that run on the Edge or in Node.js — all within the same project.
+
+In this guide, I'll walk through building a production-ready REST API for a task management app.
+
+## Why Route Handlers?
+
+Before the App Router, Next.js API routes (`/pages/api`) were functional but limited. Route Handlers (`/app/api`) improve on them with:
+
+- **File-based routing** mirroring the frontend
+- **Support for Edge Runtime**
+- **Middleware integration**
+- **Type-safe request/response handling**
+
+## Project Setup
+
+Start by creating the API directory structure:
+
+```
+app/
+└── api/
+    └── tasks/
+        ├── route.ts        # GET /api/tasks, POST /api/tasks
+        └── [id]/
+            └── route.ts    # GET/PUT/DELETE /api/tasks/:id
+```
+
+## Connecting to a Database
+
+I'll use Prisma with PostgreSQL. First, install the dependencies:
+
+```bash
+npm install @prisma/client
+npm install -D prisma
+npx prisma init
+```
+
+Define your schema:
+
+```prisma
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+Run the migration:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+## Building the Route Handlers
+
+### GET /api/tasks — Fetch all tasks
+
+```typescript
+// app/api/tasks/route.ts
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+export async function GET() {
+  try {
+    const tasks = await prisma.task.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
+    return NextResponse.json(tasks)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch tasks' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+### POST /api/tasks — Create a task
+
+```typescript
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const { title, description } = body
+
+    if (!title || typeof title !== 'string') {
+      return NextResponse.json(
+        { error: 'Title is required and must be a string' },
+        { status: 400 }
+      )
+    }
+
+    const task = await prisma.task.create({
+      data: { title, description },
+    })
+
+    return NextResponse.json(task, { status: 201 })
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to create task' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+### Dynamic Route — GET /api/tasks/[id]
+
+```typescript
+// app/api/tasks/[id]/route.ts
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  try {
+    const task = await prisma.task.findUnique({ where: { id } })
+    if (!task) {
+      return NextResponse.json(
+        { error: 'Task not found' },
+        { status: 404 }
+      )
+    }
+    return NextResponse.json(task)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch task' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+### PUT /api/tasks/[id] — Update a task
+
+```typescript
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  try {
+    const body = await request.json()
+    const task = await prisma.task.update({
+      where: { id },
+      data: body,
+    })
+    return NextResponse.json(task)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to update task' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+### DELETE /api/tasks/[id] — Remove a task
+
+```typescript
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  try {
+    await prisma.task.delete({ where: { id } })
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to delete task' },
+      { status: 500 }
+    )
+  }
+}
+```
+
+## Error Handling Patterns
+
+A robust API needs consistent error handling:
+
+```typescript
+// lib/api-utils.ts
+import { NextResponse } from 'next/server'
+
+export function handleApiError(error: unknown) {
+  console.error('API Error:', error)
+
+  if (error instanceof PrismaClientKnownRequestError) {
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Resource not found' },
+        { status: 404 }
+      )
+    }
+  }
+
+  return NextResponse.json(
+    { error: 'Internal server error' },
+    { status: 500 }
+  )
+}
+```
+
+## Middleware for Authentication
+
+Protect your API routes with middleware:
+
+```typescript
+// middleware.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  // Check for API routes
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+  }
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: '/api/:path*',
+}
+```
+
+## Testing with Postman or Bruno
+
+Once your API is running, test each endpoint:
+
+```
+GET    http://localhost:3000/api/tasks
+POST   http://localhost:3000/api/tasks       Body: { "title": "My Task" }
+GET    http://localhost:3000/api/tasks/clx... 
+PUT    http://localhost:3000/api/tasks/clx...  Body: { "status": "completed" }
+DELETE http://localhost:3000/api/tasks/clx...
+```
+
+## Deployment Considerations
+
+When deploying to Vercel:
+
+1. Set `DATABASE_URL` in environment variables
+2. Run `npx prisma generate` during build
+3. Consider using **Vercel Postgres** for managed database
+4. Enable **Edge Functions** for lower-latency API routes
+
+## Conclusion
+
+Next.js Route Handlers provide a seamless way to build APIs alongside your frontend. The file-based routing, type safety, and middleware support make it a solid choice for full-stack applications.
+
+For the complete source code, check out the [project repository](https://github.com). The key takeaway is: you don't need a separate backend server for most applications — Next.js can handle it all.

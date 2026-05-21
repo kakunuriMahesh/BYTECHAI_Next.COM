@@ -1,0 +1,331 @@
+---
+title: "Getting Started with Prisma ORM in Next.js 15"
+description: "A hands-on guide to integrating Prisma ORM with Next.js 15 — schema design, migrations, queries, and production best practices."
+date: "2026-06-05"
+tags: ["Prisma", "Next.js", "Database", "ORM", "TypeScript"]
+author: "Mahesh Kakunuri"
+readingTime: "9 min read"
+published: true
+---
+
+Prisma has become the go-to ORM for Next.js applications. Its type-safe API, auto-generated queries, and seamless migration workflow make it an essential tool for full-stack developers.
+
+In this guide, I'll walk through setting up Prisma with Next.js 15 from scratch.
+
+## Why Prisma?
+
+Compared to traditional ORMs, Prisma offers:
+
+- **Type safety**: Queries return TypeScript types inferred from your schema
+- **Auto-completion**: Your editor knows exactly what fields are available
+- **Migrations**: Declarative schema changes with rollback support
+- **Performance**: Batching, caching, and connection pooling built-in
+
+## Project Setup
+
+Start by installing Prisma:
+
+```bash
+npm install @prisma/client
+npm install -D prisma
+npx prisma init
+```
+
+This creates two files:
+- `prisma/schema.prisma` — Your database schema
+- `.env` — Database connection string
+
+## Defining Your Schema
+
+Here's a typical schema for a blog application:
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  bio       String?
+  avatar    String?
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  excerpt     String?
+  published   Boolean   @default(false)
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  tags        Tag[]
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+}
+```
+
+## Creating the Prisma Client
+
+Set up a singleton client to avoid multiple instances during development:
+
+```typescript
+// lib/prisma.ts
+import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query'] : [],
+  })
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+```
+
+## Running Migrations
+
+```bash
+# Create the initial migration
+npx prisma migrate dev --name init
+
+# Apply migrations in production
+npx prisma migrate deploy
+```
+
+## CRUD Operations
+
+### Creating Records
+
+```typescript
+// app/api/posts/route.ts
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+export async function POST(request: Request) {
+  const body = await request.json()
+
+  const post = await prisma.post.create({
+    data: {
+      title: body.title,
+      slug: body.title.toLowerCase().replace(/ /g, '-'),
+      content: body.content,
+      excerpt: body.excerpt,
+      authorId: body.authorId,
+      tags: {
+        connectOrCreate: body.tags.map((tag: string) => ({
+          where: { name: tag },
+          create: { name: tag },
+        })),
+      },
+    },
+    include: {
+      author: true,
+      tags: true,
+    },
+  })
+
+  return NextResponse.json(post, { status: 201 })
+}
+```
+
+### Reading with Relations
+
+```typescript
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '10')
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        author: {
+          select: { name: true, avatar: true },
+        },
+        tags: true,
+        _count: {
+          select: { comments: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.post.count({ where: { published: true } }),
+  ])
+
+  return NextResponse.json({
+    posts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  })
+}
+```
+
+### Updating Records
+
+```typescript
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  const body = await request.json()
+
+  const post = await prisma.post.update({
+    where: { id },
+    data: {
+      title: body.title,
+      content: body.content,
+      published: body.published,
+    },
+  })
+
+  return NextResponse.json(post)
+}
+```
+
+### Deleting Records
+
+```typescript
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  await prisma.post.delete({ where: { id } })
+  return new NextResponse(null, { status: 204 })
+}
+```
+
+## Advanced Query Patterns
+
+### Pagination with Cursor
+
+```typescript
+const posts = await prisma.post.findMany({
+  take: 10,
+  skip: 1, // Skip the cursor
+  cursor: { id: 'some-post-id' },
+  orderBy: { createdAt: 'desc' },
+})
+```
+
+### Full-Text Search
+
+```typescript
+const searchResults = await prisma.post.findMany({
+  where: {
+    OR: [
+      { title: { contains: searchTerm, mode: 'insensitive' } },
+      { content: { contains: searchTerm, mode: 'insensitive' } },
+    ],
+  },
+})
+```
+
+### Aggregations
+
+```typescript
+const stats = await prisma.post.aggregate({
+  _count: { id: true },
+  _avg: { /* numeric fields */ },
+  where: { published: true },
+})
+```
+
+## Production Best Practices
+
+### Connection Pooling
+
+For serverless environments like Vercel, use connection pooling:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // For Vercel Postgres, use the pooled connection URL
+  // directUrl = env("DIRECT_DATABASE_URL") // For migrations
+}
+```
+
+### Query Optimization
+
+```typescript
+// ❌ N+1 problem
+const posts = await prisma.post.findMany()
+for (const post of posts) {
+  const author = await prisma.user.findUnique({ where: { id: post.authorId } })
+}
+
+// ✅ Use include or select
+const posts = await prisma.post.findMany({
+  include: { author: true },
+})
+```
+
+### Error Handling
+
+```typescript
+import { Prisma } from '@prisma/client'
+
+try {
+  await prisma.post.create({ data })
+} catch (error) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2002') {
+      // Unique constraint violation
+      return NextResponse.json(
+        { error: 'A post with this slug already exists' },
+        { status: 409 }
+      )
+    }
+  }
+  throw error
+}
+```
+
+## Conclusion
+
+Prisma ORM + Next.js 15 is a powerful combination for building full-stack applications. The type safety alone saves countless hours of debugging, and the migration workflow makes schema changes predictable and safe.
+
+Start with a simple schema, use the Prisma Studio (`npx prisma studio`) to explore your data visually, and gradually adopt the advanced patterns as your application grows.

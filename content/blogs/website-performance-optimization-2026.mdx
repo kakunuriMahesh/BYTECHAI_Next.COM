@@ -1,0 +1,277 @@
+---
+title: "The Complete Guide to Website Performance Optimization in 2026"
+description: "A practical guide to achieving 90+ Lighthouse scores — covering Core Web Vitals, image optimization, caching strategies, and performance budgets."
+date: "2026-06-02"
+tags: ["Performance", "Web Vitals", "SEO", "Optimization", "Best Practices"]
+author: "Mahesh Kakunuri"
+readingTime: "13 min read"
+published: true
+---
+
+Website performance directly impacts user experience, conversion rates, and search rankings. In 2026, Google's Core Web Vitals are more important than ever. Here's how to optimize for them.
+
+## Understanding Core Web Vitals
+
+Three metrics define user experience:
+
+| Metric | What It Measures | Good Target |
+|--------|-----------------|-------------|
+| **LCP** (Largest Contentful Paint) | Loading speed | < 2.5s |
+| **FID** (First Input Delay) / **INP** (Interaction to Next Paint) | Interactivity | < 200ms |
+| **CLS** (Cumulative Layout Shift) | Visual stability | < 0.1 |
+
+## 1. Image Optimization
+
+Images are the #1 cause of slow websites. Here's how to optimize them:
+
+### Use Modern Formats
+
+```typescript
+// Next.js automatically converts to WebP and AVIF
+import Image from 'next/image'
+
+<Image
+  src="/hero.jpg"
+  alt="Hero image"
+  width={1200}
+  height={630}
+  priority={true} // Only for above-the-fold images
+  placeholder="blur" // Show blur-up while loading
+  quality={85} // 85 is the sweet spot for quality/size
+/>
+```
+
+### Lazy Loading
+
+```typescript
+// Images below the fold load lazily by default with next/image
+// For manual control:
+<Image loading="lazy" />  // Default for non-priority images
+```
+
+### Responsive Images
+
+```typescript
+<Image
+  src="/large.jpg"
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  // Browser picks the right size based on viewport
+/>
+```
+
+## 2. Font Optimization
+
+Fonts can cause significant layout shift and loading delays:
+
+```typescript
+// src/app/layout.tsx
+import { Outfit, Space_Grotesk } from 'next/font/google'
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap', // Show fallback font immediately
+  variable: '--font-outfit', // CSS variable approach
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+})
+```
+
+Benefits of `next/font`:
+- **Automatic subsetting** — only loads the characters you need
+- **Self-hosting** — no external requests
+- **Automatic `size-adjust`** — prevents layout shift
+- **CSS `display: swap`** — text remains visible during load
+
+## 3. Bundle Optimization
+
+### Code Splitting
+
+```typescript
+// Dynamic imports for heavy components
+const HeavyChart = dynamic(() => import('@/components/HeavyChart'), {
+  loading: () => <ChartSkeleton />,
+  ssr: false, // Don't render on server if not needed
+})
+```
+
+### Package Optimization
+
+```typescript
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'react-icons', '@radix-ui/react-icons'],
+  },
+}
+```
+
+This prevents importing entire icon libraries when you only use a few.
+
+### Tree Shaking
+
+```typescript
+// ❌ Bad - imports entire library
+import { Button, Card, Badge } from 'antd'
+
+// ✅ Good - imports only what you need
+import Button from 'antd/es/button'
+import Card from 'antd/es/card'
+```
+
+## 4. Caching Strategy
+
+### Browser Caching
+
+```typescript
+// next.config.ts
+const nextConfig = {
+  headers: async () => [
+    {
+      source: '/images/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
+    },
+    {
+      source: '/fonts/:path*',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
+    },
+  ],
+}
+```
+
+### Static vs Dynamic Rendering
+
+```typescript
+// ✅ Static - pre-rendered at build time, served from CDN
+export default async function BlogPage() {
+  const posts = getAllBlogPosts() // Runs at build time
+  return <BlogList posts={posts} />
+}
+
+// ❌ Dynamic - rendered on every request
+export const dynamic = 'force-dynamic'
+export default async function DashboardPage() {
+  const data = await fetchRealtimeData()
+  return <Dashboard data={data} />
+}
+```
+
+## 5. Minimize JavaScript
+
+### Server Components
+
+```typescript
+// ✅ Server Component - no JavaScript sent to browser
+export default function AboutPage() {
+  return (
+    <div>
+      <h1>About Us</h1>
+      <p>This content doesn't need interactivity.</p>
+    </div>
+  )
+}
+```
+
+### Client Component Boundary
+
+```typescript
+// ❌ Bad - entire component tree becomes client-rendered
+'use client'
+export default function Page() {
+  return (
+    <div>
+      <Header />
+      <InteractiveSection />
+      <Footer /> {/* This doesn't need to be a client component */}
+    </div>
+  )
+}
+
+// ✅ Good - only the interactive part is a client component
+export default function Page() {
+  return (
+    <div>
+      <Header />         {/* Server Component */}
+      <InteractiveSection /> {/* Client Component */}
+      <Footer />         {/* Server Component */}
+    </div>
+  )
+}
+```
+
+## 6. Performance Budgets
+
+Set a performance budget and enforce it in CI:
+
+```bash
+# package.json
+{
+  "scripts": {
+    "lint": "next lint",
+    "build": "next build",
+    "perf": "lighthouse-ci https://your-site.com --budget=performance.json"
+  }
+}
+```
+
+Example budget file:
+
+```json
+{
+  "performance": 90,
+  "accessibility": 90,
+  "best-practices": 90,
+  "seo": 90,
+  "resource-summary": {
+    "script": { "size": 200000 },  // 200KB max
+    "image": { "size": 1000000 },  // 1MB max
+    "total": { "size": 2500000 }   // 2.5MB total
+  }
+}
+```
+
+## 7. Real-World Results
+
+After applying these optimizations to ByteChai:
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Lighthouse Performance | ~72 | 95+ |
+| LCP | 4.2s | 1.3s |
+| TBT (Total Blocking Time) | 320ms | 50ms |
+| CLS | 0.15 | 0.02 |
+| Bundle Size (JS) | 480KB | 120KB |
+
+## 8. Measuring Performance
+
+Use these tools to track performance:
+
+- **Lighthouse** — Built into Chrome DevTools
+- **Web Vitals Extension** — Real-time Core Web Vitals
+- **PageSpeed Insights** — Google's official tool
+- **Vercel Analytics** — Real user monitoring (RUM)
+- **Sentry Performance** — Error tracking with performance data
+
+## Conclusion
+
+Performance optimization is an ongoing process, not a one-time task. Start with the highest-impact changes:
+
+1. Optimize images (often the biggest win)
+2. Use server components by default
+3. Optimize fonts (free win with next/font)
+4. Set a performance budget
+5. Monitor with real user data
+
+The effort is worth it. Every 100ms improvement in load time can increase conversion rates by up to 7%. In 2026, performance isn't just a technical concern — it's a business imperative.
