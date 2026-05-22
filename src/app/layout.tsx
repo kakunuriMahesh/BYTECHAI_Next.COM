@@ -53,6 +53,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: '7540dfadf63c836a',
+  },
   other: {
     'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_ID || '',
   },
