@@ -7,10 +7,12 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import remarkGfm from 'remark-gfm'
 import { constructMetadata } from '@/lib/seo'
 import { getBlogPost, getRelatedPosts, getBlogSlugs } from '@/lib/mdx'
+import { getTopic, getPostsInTopic } from '@/lib/topics'
 import { formatDate } from '@/lib/utils'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { ReadingProgress } from '@/components/layout/ReadingProgress'
 import { FaClock, FaTag, FaUser } from 'react-icons/fa'
+import { TopicIcon } from '@/components/topics/TopicIcon'
 import Link from 'next/link'
 import { AdPlaceholder } from '@/components/shared/AdPlaceholder'
 
@@ -100,6 +102,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   })
 
   const related = getRelatedPosts(slug, post.data.tags)
+  const topic = getTopic(post.data.category)
+  const topicPosts = topic ? getPostsInTopic(slug, topic.slug) : []
 
   return (
     <>
@@ -130,7 +134,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {post.data.description}
             </p>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {topic && (
+                <Link
+                  href={`/topics/${topic.slug}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold bg-amber-50 text-chai px-3 py-1.5 rounded-full border border-amber-100 hover:bg-chai hover:text-white transition-all"
+                >
+                  <TopicIcon name={topic.icon} className="text-xs" /> {topic.title}
+                </Link>
+              )}
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                post.data.level === 'beginner' ? 'bg-green-50 text-green-700' :
+                post.data.level === 'intermediate' ? 'bg-amber-50 text-amber-700' :
+                'bg-red-50 text-red-700'
+              }`}>
+                {post.data.level.charAt(0).toUpperCase() + post.data.level.slice(1)}
+              </span>
               {post.data.tags.map((tag) => (
                 <span key={tag} className="inline-flex items-center gap-1.5 text-xs font-bold bg-chai-light text-chai px-3 py-1.5 rounded-full">
                   <FaTag size={10} />
@@ -167,6 +186,35 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                       <span>{rp.readingTime}</span>
                     </div>
                     <h3 className="font-bold group-hover:text-chai transition-colors">{rp.title}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {topic && topicPosts.length > 0 && (
+          <section className="max-w-7xl mx-auto mt-16 pt-16 border-t border-gray-100">
+            <h2 className="text-2xl font-bold mb-8">
+              More in <span className="text-chai inline-flex items-center gap-1.5"><TopicIcon name={topic.icon} /> {topic.title}</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {topicPosts.map((tp) => (
+                <Link key={tp.slug} href={`/blog/${tp.slug}`} className="block group">
+                  <div className="flex items-center gap-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                        <span>{tp.readingTime}</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          tp.level === 'beginner' ? 'bg-green-50 text-green-600' :
+                          tp.level === 'intermediate' ? 'bg-amber-50 text-amber-600' :
+                          'bg-red-50 text-red-600'
+                        }`}>
+                          {tp.level}
+                        </span>
+                      </div>
+                      <h3 className="font-bold group-hover:text-chai transition-colors truncate">{tp.title}</h3>
+                    </div>
                   </div>
                 </Link>
               ))}

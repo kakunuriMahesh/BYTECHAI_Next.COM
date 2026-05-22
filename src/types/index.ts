@@ -14,6 +14,8 @@ export interface Project {
   results?: string[]
 }
 
+export type Level = 'beginner' | 'intermediate' | 'advanced'
+
 export interface BlogPost {
   slug: string
   title: string
@@ -24,6 +26,8 @@ export interface BlogPost {
   readingTime: string
   featuredImage?: string
   published: boolean
+  category: string
+  level: Level
 }
 
 export interface Service {

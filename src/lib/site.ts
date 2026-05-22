@@ -12,10 +12,11 @@ export const siteConfig: SiteConfig = {
 }
 
 export const navLinks: NavLink[] = [
-  { name: 'About', path: '/about' },
-  { name: 'Projects', path: '/projects' },
+  { name: 'Topics', path: '/topics' },
   { name: 'Blog', path: '/blog' },
+  { name: 'Projects', path: '/projects' },
   { name: 'Work & Expertise', path: '/services' },
+  { name: 'About', path: '/about' },
   { name: 'Uses', path: '/uses' },
   { name: 'Contact', path: '/contact' },
 ]
