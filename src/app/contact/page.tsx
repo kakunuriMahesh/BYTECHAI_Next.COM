@@ -19,11 +19,11 @@ export default function ContactPage() {
             Get In Touch
           </span>
           <h1 className="text-4xl sm:text-6xl font-bold mb-8 leading-tight">
-            Ready to <span className="text-chai italic">Brew</span> Your Project?
+            Let&apos;s <span className="text-chai italic">Connect</span>
           </h1>
           <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-            Have a question, feedback, or a project that needs technical expertise? 
-            I&apos;m just a message away. Reach out and let&apos;s build something amazing.
+            Open to collaborations, discussions, and interesting opportunities. 
+            Whether you have a project idea, a question, or just want to say hello — I&apos;d love to hear from you.
           </p>
 
           <div className="bg-amber-50 rounded-3xl p-6 mb-8 border border-amber-100">

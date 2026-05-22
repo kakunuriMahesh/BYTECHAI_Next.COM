@@ -1,9 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { services } from '@/lib/site'
 import { SectionHeading } from '@/components/shared/SectionHeading'
 import { HiOutlineGlobeAlt, HiOutlineDeviceMobile, HiOutlineLightBulb, HiOutlineLightningBolt } from 'react-icons/hi'
+import { FaArrowRight } from 'react-icons/fa'
 
 const iconMap: Record<string, React.ReactNode> = {
   HiOutlineGlobeAlt: <HiOutlineGlobeAlt />,
@@ -14,12 +16,12 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export function ServicesSection() {
   return (
-    <section className="py-24 px-6 bg-white/50">
+    <section className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <SectionHeading
-          label="Services"
-          title="What I Offer"
-          description="Full-stack development services tailored to your project needs."
+          label="Expertise"
+          title="Areas of Focus"
+          description="I occasionally collaborate on interesting projects or independent work."
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -46,6 +48,15 @@ export function ServicesSection() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-2 text-chai font-medium hover:text-chai-dark transition-colors group"
+          >
+            Learn More About My Work <FaArrowRight className="group-hover:translate-x-1 transition-transform" size={12} />
+          </Link>
         </div>
       </div>
     </section>

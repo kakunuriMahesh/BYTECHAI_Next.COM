@@ -50,7 +50,7 @@ export function Navbar() {
             </Link>
           ))}
           <Link href="/contact" className="bg-chai text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-chai-dark transition-all shadow-lg shadow-amber-200 hover:shadow-xl">
-            Get Started
+            Get in Touch
           </Link>
         </div>
 
@@ -90,7 +90,7 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className="bg-chai text-white text-center py-3 rounded-full font-medium mt-2"
               >
-                Get Started
+                Get in Touch
               </Link>
             </div>
           </motion.div>

@@ -13,7 +13,7 @@ export function Footer() {
         { name: 'About', path: '/about' },
         { name: 'Projects', path: '/projects' },
         { name: 'Blog', path: '/blog' },
-        { name: 'Services', path: '/services' },
+        { name: 'Work & Expertise', path: '/services' },
         { name: 'Contact', path: '/contact' },
       ],
     },

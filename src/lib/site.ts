@@ -2,7 +2,7 @@ import type { NavLink, SocialLink, SiteConfig, Project, Testimonial, Service } f
 
 export const siteConfig: SiteConfig = {
   name: 'ByteChai',
-  description: 'Where technology meets creativity. We brew high-performance digital solutions with a human touch.',
+  description: 'A personal blog and portfolio by Mahesh Kakunuri — writing about modern web development, system design, and scalable applications.',
   url: 'https://bytechai.com',
   ogImage: '/images/og-default.png',
   links: {
@@ -15,7 +15,7 @@ export const navLinks: NavLink[] = [
   { name: 'About', path: '/about' },
   { name: 'Projects', path: '/projects' },
   { name: 'Blog', path: '/blog' },
-  { name: 'Services', path: '/services' },
+  { name: 'Work & Expertise', path: '/services' },
   { name: 'Uses', path: '/uses' },
   { name: 'Contact', path: '/contact' },
 ]
@@ -26,10 +26,10 @@ export const socialLinks: SocialLink[] = [
 ]
 
 export const stats = [
-  { label: 'Projects Built', value: '50+' },
+  { label: 'Years Experience', value: '5+' },
   { label: 'Technologies Used', value: '30+' },
-  { label: 'Articles Written', value: '25+' },
-  { label: 'Available For', value: 'Freelance' },
+  { label: 'Articles Published', value: '10+' },
+  { label: 'Open For', value: 'Collaboration' },
 ]
 
 export const featuredProjects: Project[] = [
@@ -123,20 +123,14 @@ export const services: Service[] = [
 export const testimonials: Testimonial[] = [
   {
     name: 'Rahul Sharma',
-    role: 'Startup Founder',
-    text: 'ByteChai transformed our vision into a stunning reality. Their attention to detail is unmatched.',
+    role: 'Founder, SaaS Startup',
+    text: 'Working with Mahesh was a great experience. He improved our architecture, optimized performance, and delivered ahead of schedule.',
     rating: 5,
   },
   {
     name: 'Priya Patel',
-    role: 'Marketing Director',
-    text: 'Professional, responsive, and incredibly creative. They brew digital magic!',
-    rating: 5,
-  },
-  {
-    name: 'Mark Wilson',
-    role: 'CTO, TechFlow',
-    text: 'Clean code and exceptional strategy. The best partner for any high-scale project.',
+    role: 'Engineering Manager',
+    text: 'Clean code, clear communication, and a strong understanding of modern web architecture. A reliable engineering partner.',
     rating: 5,
   },
 ]
@@ -166,8 +160,8 @@ export const contactInfo = [
   {
     icon: 'HiOutlinePhone',
     label: 'Phone',
-    value: '+91 7981881518',
-    href: 'tel:+917981881518',
+    value: '+91 9985875017',
+    href: 'tel:+919985875017',
   },
   {
     icon: 'HiOutlineLocationMarker',

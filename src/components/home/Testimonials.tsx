@@ -3,19 +3,18 @@
 import { motion } from 'framer-motion'
 import { testimonials } from '@/lib/site'
 import { SectionHeading } from '@/components/shared/SectionHeading'
-import { FaStar } from 'react-icons/fa'
 
 export function Testimonials() {
   return (
     <section className="py-24 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <SectionHeading
-          label="Testimonials"
+          label="Client Feedback"
           title="What People Say"
-          description="Feedback from clients and collaborators."
+          description="Feedback collected from independent client work."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
@@ -26,11 +25,6 @@ export function Testimonials() {
               className="bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100 flex flex-col justify-between"
             >
               <div>
-                <div className="flex gap-1 text-amber-400 mb-4">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <FaStar key={j} size={16} />
-                  ))}
-                </div>
                 <p className="text-gray-700 italic mb-6 leading-relaxed">&ldquo;{t.text}&rdquo;</p>
               </div>
               <div className="flex items-center gap-4">
@@ -45,6 +39,7 @@ export function Testimonials() {
             </motion.div>
           ))}
         </div>
+        <p className="text-center text-xs text-gray-400 mt-8">Feedback collected from independent client work</p>
       </div>
     </section>
   )

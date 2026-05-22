@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { FaArrowRight, FaClock, FaTag } from 'react-icons/fa'
+import { FaArrowRight, FaClock, FaTag, FaStar } from 'react-icons/fa'
 import { SectionHeading } from '@/components/shared/SectionHeading'
 import { formatDate } from '@/lib/utils'
 import type { BlogPost } from '@/types'
@@ -10,17 +10,65 @@ import type { BlogPost } from '@/types'
 export function RecentBlogs({ posts }: { posts: (BlogPost & { slug: string })[] }) {
   if (posts.length === 0) return null
 
+  const [featured, ...latest] = posts
+
   return (
-    <section className="py-24 px-6">
+    <section className="py-24 px-6 bg-white/50">
       <div className="max-w-7xl mx-auto">
         <SectionHeading
           label="Blog"
           title="Latest Articles"
-          description="Thoughts on web development, technology, and modern architecture."
+          description="Thoughts on web development, system design, and modern architecture."
         />
 
+        {featured && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold text-chai uppercase tracking-widest mb-4">
+              <FaStar size={12} /> Featured Article
+            </div>
+            <Link href={`/blog/${featured.slug}`} className="block group">
+              <div className="bg-gradient-to-br from-chai to-chai-dark rounded-[2rem] p-8 sm:p-12 text-white shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300">
+                <div className="flex items-center gap-2 text-xs text-amber-200 mb-4">
+                  <FaClock size={12} />
+                  <span>{featured.readingTime}</span>
+                  <span className="text-amber-200/50">|</span>
+                  <span>{formatDate(featured.date)}</span>
+                </div>
+                <h3 className="text-2xl sm:text-4xl font-bold mb-4 group-hover:text-amber-100 transition-colors leading-tight max-w-3xl">
+                  {featured.title}
+                </h3>
+                <p className="text-amber-100/80 text-lg leading-relaxed mb-6 max-w-2xl">
+                  {featured.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {featured.tags.slice(0, 4).map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-200 bg-white/10 px-3 py-1.5 rounded-full"
+                    >
+                      <FaTag size={8} />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        )}
+
+        <div className="flex items-center gap-3 mb-8">
+          <span className="h-px flex-1 bg-gray-100" />
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Latest Articles</span>
+          <span className="h-px flex-1 bg-gray-100" />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {posts.map((post, i) => (
+          {latest.map((post, i) => (
             <motion.div
               key={post.slug}
               initial={{ opacity: 0, y: 20 }}
