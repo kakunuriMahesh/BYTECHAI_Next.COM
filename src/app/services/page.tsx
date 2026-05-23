@@ -182,7 +182,7 @@ export default function ServicesPage() {
         <div className="space-y-4">
           {[
             { q: 'How long does a typical project take?', a: 'A standard website takes 2-4 weeks. Complex SaaS applications can take 2-4 months depending on scope. I provide a detailed timeline during our initial discussion.' },
-            { q: 'What technologies do you use?', a: 'I specialize in Next.js, React, TypeScript, Tailwind CSS, and Node.js. For databases, I prefer PostgreSQL with Prisma ORM. I choose the best tech stack for each project based on requirements.' },
+            { q: 'What technologies do you use?', a: 'I specialize in React, TypeScript, Tailwind CSS, and Node.js. For databases, I prefer PostgreSQL with Prisma ORM. I choose the best tech stack for each project based on requirements.' },
             { q: 'Do you provide post-launch support?', a: 'Yes. I offer maintenance and support packages to keep the application running smoothly — including updates, bug fixes, and performance monitoring.' },
             { q: 'How do we communicate during the project?', a: 'I provide weekly progress updates via email or Slack. We can schedule calls as needed. You\'ll have visibility into the project at every stage.' },
             { q: 'What is your pricing model?', a: 'I charge per project based on scope and complexity. After our initial discussion, I provide a detailed breakdown of deliverables and timeline.' },

@@ -27,7 +27,7 @@ export const socialLinks: SocialLink[] = [
 ]
 
 export const stats = [
-  { label: 'Years Experience', value: '5+' },
+  { label: 'Years Experience', value: '3+' },
   { label: 'Technologies Used', value: '30+' },
   { label: 'Articles Published', value: '10+' },
   { label: 'Open For', value: 'Collaboration' },
@@ -123,32 +123,49 @@ export const services: Service[] = [
 
 export const testimonials: Testimonial[] = [
   {
-    name: 'Rahul Sharma',
-    role: 'Founder, SaaS Startup',
-    text: 'Working with Mahesh was a great experience. He improved our architecture, optimized performance, and delivered ahead of schedule.',
+    name: 'Uday Nallapati',
+    role: 'Project Lead',
+    text: 'Mahesh did an outstanding job as a full-stack developer on our project. He demonstrated exceptional technical expertise in both front-end and back-end development, delivering a robust and feature-rich solution. His attention to detail, proactive communication, and commitment to meeting the timeline were truly commendable.',
     rating: 5,
   },
   {
-    name: 'Priya Patel',
-    role: 'Engineering Manager',
-    text: 'Clean code, clear communication, and a strong understanding of modern web architecture. A reliable engineering partner.',
+    name: 'kjcheon',
+    role: 'Client',
+    text: 'He is a true code expert. I think it was a wise decision to ask him for my problems. I will ask him again if I have another chance. Take my words!',
+    rating: 5,
+  },
+  {
+    name: 'R. Case',
+    role: 'Client',
+    text: 'Excellent work. Very good communication, fast work and perfect coding. I recommend Mahesh to anyone looking for a professional coder. I will use his services again in the future.',
     rating: 5,
   },
 ]
 
 export const techStack = [
-  { name: 'Next.js', icon: '/images/tech/nextjs.svg' },
-  { name: 'React', icon: '/images/tech/react.svg' },
-  { name: 'TypeScript', icon: '/images/tech/typescript.svg' },
-  { name: 'Tailwind CSS', icon: '/images/tech/tailwind.svg' },
-  { name: 'Node.js', icon: '/images/tech/nodejs.svg' },
-  { name: 'PostgreSQL', icon: '/images/tech/postgresql.svg' },
-  { name: 'Docker', icon: '/images/tech/docker.svg' },
-  { name: 'Figma', icon: '/images/tech/figma.svg' },
-  { name: 'Git', icon: '/images/tech/git.svg' },
-  { name: 'Python', icon: '/images/tech/python.svg' },
-  { name: 'AWS', icon: '/images/tech/aws.svg' },
-  { name: 'Redis', icon: '/images/tech/redis.svg' },
+  { name: 'React.js', icon: 'FaReact' },
+  { name: 'JavaScript (ES6+)', icon: 'SiJavascript' },
+  { name: 'HTML5', icon: 'SiHtml5' },
+  { name: 'CSS3', icon: 'SiCss' },
+  { name: 'Tailwind CSS', icon: 'SiTailwindcss' },
+  { name: 'Framer Motion', icon: 'SiFramer' },
+  { name: 'GSAP', icon: 'FaCode' },
+  { name: 'Redux', icon: 'SiRedux' },
+  { name: 'Redux Saga', icon: 'FaCode' },
+  { name: 'Node.js', icon: 'FaNodeJs' },
+  { name: 'n8n', icon: 'FaRobot' },
+  { name: 'REST APIs', icon: 'FaExchangeAlt' },
+  { name: 'OpenAI APIs', icon: 'SiOpenai' },
+  { name: 'MongoDB', icon: 'SiMongodb' },
+  { name: 'Razorpay', icon: 'FaCode' },
+  { name: 'Git', icon: 'FaGitAlt' },
+  { name: 'GitHub', icon: 'FaGithub' },
+  { name: 'Vite', icon: 'SiVite' },
+  { name: 'Figma', icon: 'SiFigma' },
+  { name: 'Wix Studio', icon: 'SiWix' },
+  { name: 'Hostinger', icon: 'FaCode' },
+  { name: 'Squarespace', icon: 'SiSquarespace' },
+  { name: 'Cursor AI', icon: 'FaRobot' },
 ]
 
 export const contactInfo = [

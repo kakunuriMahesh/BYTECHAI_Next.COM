@@ -28,7 +28,7 @@ export function AboutPreview() {
               building scalable systems and sharing knowledge through writing.
             </p>
             <p className="text-gray-600 leading-relaxed mb-8">
-              I specialize in Next.js, TypeScript, and modern web architecture. I believe in 
+              I specialize in React, TypeScript, and modern web architecture. I believe in 
               clean code, thoughtful design, and continuous learning. ByteChai is where I 
               document what I build and what I learn.
             </p>

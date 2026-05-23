@@ -11,7 +11,7 @@ export const metadata: Metadata = constructMetadata({
 })
 
 const aboutStats = [
-  { label: 'Years of Experience', value: '5+' },
+  { label: 'Years of Experience', value: '3+' },
   { label: 'Technologies Used', value: '30+' },
   { label: 'Articles Published', value: '10+' },
   { label: 'Open For', value: 'Collaboration' },
@@ -36,12 +36,12 @@ export default function AboutPage() {
               building scalable systems and sharing knowledge through writing.
             </p>
             <p className="text-gray-600 leading-relaxed mb-6">
-              I specialize in <strong>Next.js, TypeScript, and modern web architecture</strong>. 
+              I specialize in <strong>React, TypeScript, and modern web architecture</strong>. 
               I believe in clean code, thoughtful design, and continuous learning. ByteChai is 
               my digital workspace where I document what I build and what I learn.
             </p>
             <p className="text-gray-600 leading-relaxed mb-8">
-              Over the past 5+ years, I&apos;ve worked on projects ranging from SaaS platforms 
+              Over the past 3+ years, I&apos;ve worked on projects ranging from SaaS platforms 
               and e-commerce solutions to mobile applications and AI-powered tools. I write 
               about the challenges I solve and the patterns I discover along the way.
             </p>
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 <div className="grid grid-cols-2 gap-6">
                   {[
                     { icon: <FaBullseye />, label: 'Focus', value: 'Web & SaaS' },
-                    { icon: <FaBolt />, label: 'Stack', value: 'Next.js + TS' },
+                    { icon: <FaBolt />, label: 'Stack', value: 'React + TS' },
                     { icon: <HiOutlineLocationMarker />, label: 'Location', value: 'Hyderabad, IN' },
                     { icon: <HiOutlineMail />, label: 'Email', value: 'maheshkakunuri3@gmail.com' },
                     { icon: <FaBriefcase />, label: 'Status', value: 'Working' },
@@ -143,7 +143,7 @@ export default function AboutPage() {
               successes and mistakes.
             </p>
             <p className="text-gray-600 leading-relaxed mb-8">
-              Topics include Next.js, TypeScript, system design, performance optimization, 
+              Topics include React, TypeScript, system design, performance optimization, 
               and building production-grade applications.
             </p>
             <Link href="/blog" className="bg-chai text-white px-8 py-3 rounded-full font-medium hover:bg-chai-dark transition-all shadow-lg shadow-amber-200 inline-flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function AboutPage() {
           <div className="bg-amber-50 rounded-[2rem] p-8 border border-amber-100">
             <h3 className="font-bold text-lg mb-4 text-chai">Technologies I Work With</h3>
             <div className="flex flex-wrap gap-2">
-              {['Next.js', 'React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Prisma', 'Tailwind CSS', 'Docker', 'AWS', 'Python', 'Redis', 'GraphQL', 'Flutter', 'TensorFlow'].map((tech) => (
+              {['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'Prisma', 'Tailwind CSS', 'Docker', 'AWS', 'Python', 'Redis', 'GraphQL', 'Flutter', 'TensorFlow'].map((tech) => (
                 <span key={tech} className="text-xs font-bold bg-white text-chai px-3 py-1.5 rounded-full border border-amber-100">
                   {tech}
                 </span>

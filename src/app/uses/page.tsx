@@ -12,11 +12,11 @@ export default function UsesPage() {
     {
       title: 'Hardware',
       items: [
-        { name: 'Laptop', desc: 'MacBook Pro 16" M3 Pro' },
-        { name: 'Monitor', desc: 'Dell U2723QE 4K USB-C Hub Monitor' },
-        { name: 'Keyboard', desc: 'Keychron Q1 Mechanical Keyboard' },
-        { name: 'Mouse', desc: 'Logitech MX Master 3S' },
-        { name: 'Headphones', desc: 'Sony WH-1000XM5' },
+        { name: 'Device', desc: 'Dell Windows 11 Home — DESKTOP-6VL53DB' },
+        { name: 'Processor', desc: '12th Gen Intel Core i7-1255U (1.70 GHz)' },
+        { name: 'Memory', desc: '16.0 GB RAM' },
+        { name: 'OS', desc: 'Windows 11 Home, Version 25H2' },
+        { name: 'Pen & Touch', desc: 'Pen and touch support with 10 touch points' },
       ],
     },
     {
@@ -24,8 +24,8 @@ export default function UsesPage() {
       items: [
         { name: 'Editor', desc: 'VS Code with One Dark Pro theme' },
         { name: 'Font', desc: 'JetBrains Mono Nerd Font' },
-        { name: 'Terminal', desc: 'iTerm2 with Oh My Zsh' },
-        { name: 'Shell', desc: 'Zsh with powerlevel10k' },
+        { name: 'Terminal', desc: 'Windows Terminal' },
+        { name: 'Shell', desc: 'PowerShell 5.1' },
       ],
     },
     {
@@ -40,10 +40,11 @@ export default function UsesPage() {
     {
       title: 'Development Stack',
       items: [
-        { name: 'Framework', desc: 'Next.js 15 with App Router' },
-        { name: 'Styling', desc: 'Tailwind CSS v4 + shadcn/ui' },
+        { name: 'UI Library', desc: 'React 19 with TypeScript' },
+        { name: 'Styling', desc: 'Tailwind CSS v4' },
         { name: 'Animation', desc: 'Framer Motion for animations' },
-        { name: 'Database', desc: 'PostgreSQL with Prisma ORM' },
+        { name: 'Database', desc: 'MongoDB, PostgreSQL, Supabase' },
+        // { name: 'ORMs', desc: 'Prisma ORM' },
         { name: 'Deployment', desc: 'Vercel for hosting and CI/CD' },
       ],
     },

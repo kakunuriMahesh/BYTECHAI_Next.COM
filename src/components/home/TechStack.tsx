@@ -2,8 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { techStack } from '@/lib/site'
-import { FaCode } from 'react-icons/fa'
 import { SectionHeading } from '@/components/shared/SectionHeading'
+import { TechStackIcon } from '@/components/home/TechStackIcon'
 
 export function TechStack() {
   return (
@@ -27,7 +27,7 @@ export function TechStack() {
               className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-lg transition-all flex flex-col items-center gap-3 group"
             >
               <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-chai text-xl group-hover:bg-chai group-hover:text-white transition-colors">
-                <FaCode />
+                <TechStackIcon name={tech.icon} className="text-xl" />
               </div>
               <span className="text-xs font-semibold text-gray-600 text-center">{tech.name}</span>
             </motion.div>
