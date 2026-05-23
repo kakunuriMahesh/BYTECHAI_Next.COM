@@ -49,12 +49,14 @@ They slowly become difficult through hundreds of small architectural decisions.
 
 ---
 
-# The Biggest Mistake Developers Make
+## The Biggest Mistake Developers Make
 
 Most developers structure React applications around:
+
 > "How do I make this feature work?"
 
 Instead of:
+
 > "How will this system evolve after 6 months?"
 
 That single mindset difference changes frontend architecture completely.
@@ -64,12 +66,11 @@ Because scalability is not about:
 - creating more folders
 - adding more abstractions
 
-It's about:
-# reducing future confusion.
+It's about **reducing future confusion**.
 
 ---
 
-# The "Everything Inside Components" Problem
+## The "Everything Inside Components" Problem
 
 One of the most common patterns I see:
 
@@ -116,20 +117,18 @@ function UsersPage() {
 
 This works initially.
 
-But after scaling:
-this becomes painful.
+But after scaling this becomes painful.
 
 Why?
 
 Because the component is handling:
-
-* API logic
-* business logic
-* filtering
-* modal state
-* rendering
-* side effects
-* data management
+- API logic
+- business logic
+- filtering
+- modal state
+- rendering
+- side effects
+- data management
 
 all in one place.
 
@@ -137,56 +136,49 @@ This is where React applications slowly become exhausting to maintain.
 
 ---
 
-# Why Large React Projects Become Hard to Debug
+## Why Large React Projects Become Hard to Debug
 
 The problem is usually not:
 
 > "too much code"
 
-The real problem is:
-
-# unclear responsibility.
+The real problem is **unclear responsibility**.
 
 When responsibilities are mixed:
-
-* debugging becomes slower
-* onboarding becomes harder
-* reusability decreases
-* changes create side effects
-* developers fear touching old code
+- debugging becomes slower
+- onboarding becomes harder
+- reusability decreases
+- changes create side effects
+- developers fear touching old code
 
 This is why some projects feel:
-
-* stressful
-* fragile
-* unpredictable
+- stressful
+- fragile
+- unpredictable
 
 even if the UI looks simple.
 
 ---
 
-# React Applications Should Be Structured Like Systems
+## React Applications Should Be Structured Like Systems
 
 One thing that changed how I build applications:
 
 I stopped thinking in pages.
 
 And started thinking in:
-
-* systems
-* features
-* responsibilities
-* boundaries
+- systems
+- features
+- responsibilities
+- boundaries
 
 This is a massive shift.
 
-Because scalable frontend engineering is less about components and more about:
-
-# separation of concerns.
+Because scalable frontend engineering is less about components and more about **separation of concerns**.
 
 ---
 
-# My Current Approach to Structuring React Applications
+## My Current Approach to Structuring React Applications
 
 Instead of throwing everything into global folders, I prefer feature-oriented organization.
 
@@ -207,25 +199,20 @@ src/
 
 At first glance this may look standard.
 
-But the important part is:
-
-# how responsibilities are separated.
+But the important part is **how responsibilities are separated**.
 
 ---
 
-# The Difference Between `components/` and `features/`
+## The Difference Between `components/` and `features/`
 
 This is where many React applications become confusing.
 
----
-
-## `components/`
+### `components/`
 
 This folder should contain:
-
-* reusable UI elements
-* generic presentation components
-* shared design system parts
+- reusable UI elements
+- generic presentation components
+- shared design system parts
 
 Example:
 
@@ -241,14 +228,11 @@ components/
 These components should not know business rules.
 
 They should only care about:
+- UI
+- appearance
+- interaction
 
-* UI
-* appearance
-* interaction
-
----
-
-## `features/`
+### `features/`
 
 This is where application behavior lives.
 
@@ -278,97 +262,79 @@ Now everything related to users stays together.
 
 This changes debugging completely.
 
-Because instead of searching the entire project:
-you know exactly where the logic belongs.
+Because instead of searching the entire project, you know exactly where the logic belongs.
 
 ---
 
-# AI Can Generate React Code — But It Cannot Save Bad Architecture
+## AI Can Generate React Code — But It Cannot Save Bad Architecture
 
 This is something developers are starting to realize.
 
 AI tools can generate:
-
-* components
-* hooks
-* API calls
-* forms
-* tables
+- components
+- hooks
+- API calls
+- forms
+- tables
 
 very quickly.
 
-But if you don't understand architecture:
-AI-generated code can make projects worse much faster.
+But if you don't understand architecture, AI-generated code can make projects worse much faster.
 
 Why?
 
 Because AI often generates:
+- duplicated logic
+- unnecessary abstractions
+- inconsistent patterns
+- oversized components
+- mixed responsibilities
 
-* duplicated logic
-* unnecessary abstractions
-* inconsistent patterns
-* oversized components
-* mixed responsibilities
-
-And if developers copy-paste blindly:
-the codebase becomes chaotic very quickly.
+And if developers copy-paste blindly, the codebase becomes chaotic very quickly.
 
 This is why frontend engineering still matters deeply even in the AI era.
 
 Good architecture requires:
-
-* judgment
-* boundaries
-* scalability thinking
-* understanding tradeoffs
+- judgment
+- boundaries
+- scalability thinking
+- understanding tradeoffs
 
 Not just code generation.
 
 ---
 
-# The Folder Structure Debate Is Often Misunderstood
+## The Folder Structure Debate Is Often Misunderstood
 
 Many developers ask:
 
 > "What is the best React folder structure?"
 
-Honestly:
-there is no universal perfect structure.
+Honestly, there is no universal perfect structure.
 
 A folder structure only succeeds if:
+- developers understand it
+- responsibilities are clear
+- scaling remains predictable
 
-* developers understand it
-* responsibilities are clear
-* scaling remains predictable
-
-The real goal is not:
-
-# "perfect folders"
-
-The real goal is:
-
-# predictable systems.
+The real goal is not **perfect folders**. The real goal is **predictable systems**.
 
 ---
 
-# One Mistake I Made Earlier
+## One Mistake I Made Earlier
 
-Earlier in my projects,
-I tried making everything reusable immediately.
+Earlier in my projects, I tried making everything reusable immediately.
 
 I thought:
 
 > "This might be reused later."
 
 So I created:
+- overly generic components
+- complex prop systems
+- abstraction-heavy wrappers
 
-* overly generic components
-* complex prop systems
-* abstraction-heavy wrappers
-
-The result?
-
-Development actually became slower.
+The result? Development actually became slower.
 
 Now I follow a much simpler rule:
 
@@ -378,139 +344,117 @@ Premature abstraction is one of the biggest frontend architecture traps.
 
 ---
 
-# Large React Applications Need Clear Boundaries
+## Large React Applications Need Clear Boundaries
 
-One thing that improves scalability dramatically:
-
-# clear ownership.
-
-Example:
+One thing that improves scalability dramatically is **clear ownership**.
 
 Bad approach:
-
-* API calls scattered everywhere
-* validation duplicated
-* business logic inside UI
-* modals managed globally for no reason
+- API calls scattered everywhere
+- validation duplicated
+- business logic inside UI
+- modals managed globally for no reason
 
 Better approach:
+- isolated feature logic
+- centralized services
+- predictable state boundaries
+- reusable workflows
 
-* isolated feature logic
-* centralized services
-* predictable state boundaries
-* reusable workflows
-
-When boundaries become clear:
-everything becomes easier:
-
-* debugging
-* onboarding
-* scaling
-* testing
-* feature updates
+When boundaries become clear, everything becomes easier:
+- debugging
+- onboarding
+- scaling
+- testing
+- feature updates
 
 ---
 
-# A Real Example From Dynamic Form Systems
+## A Real Example From Dynamic Form Systems
 
-In one dynamic form-heavy project,
-the initial implementation was simple.
+In one dynamic form-heavy project, the initial implementation was simple.
 
 But later:
-
-* conditional dropdowns
-* nested dependencies
-* validation rules
-* dynamic rendering
-* backend-driven configs
+- conditional dropdowns
+- nested dependencies
+- validation rules
+- dynamic rendering
+- backend-driven configs
 
 started increasing rapidly.
 
 Initially all logic existed inside components.
 
 Soon:
+- components became massive
+- updating one field broke another
+- debugging became frustrating
 
-* components became massive
-* updating one field broke another
-* debugging became frustrating
+The fix was not rewriting React. The fix was restructuring responsibilities:
+- validation layer
+- config layer
+- rendering layer
+- dependency management layer
 
-The fix was not rewriting React.
-
-The fix was restructuring responsibilities:
-
-* validation layer
-* config layer
-* rendering layer
-* dependency management layer
-
-After separation:
-the project became dramatically easier to manage.
+After separation, the project became dramatically easier to manage.
 
 This is why architecture matters more as complexity grows.
 
 ---
 
-# Good Frontend Architecture Feels Invisible
+## Good Frontend Architecture Feels Invisible
 
 This is something many developers realize late.
 
 Good architecture usually doesn't look impressive.
 
 It looks:
-
-* understandable
-* predictable
-* calm
-* maintainable
+- understandable
+- predictable
+- calm
+- maintainable
 
 Bad architecture often looks:
-
-* clever
-* over-engineered
-* complicated
-* abstract-heavy
+- clever
+- over-engineered
+- complicated
+- abstract-heavy
 
 until scaling begins.
 
 ---
 
-# Questions I Ask Before Adding New Structure
+## Questions I Ask Before Adding New Structure
 
-Before introducing new architecture,
-I usually ask:
-
-* Will this reduce future confusion?
-* Does this improve maintainability?
-* Is this solving a real scaling problem?
-* Will new developers understand this quickly?
-* Is this abstraction actually necessary?
+Before introducing new architecture, I usually ask:
+- Will this reduce future confusion?
+- Does this improve maintainability?
+- Is this solving a real scaling problem?
+- Will new developers understand this quickly?
+- Is this abstraction actually necessary?
 
 These questions prevent unnecessary complexity.
 
 ---
 
-# What Actually Makes React Applications Scalable
+## What Actually Makes React Applications Scalable
 
 Not:
-
-* more folders
-* more patterns
-* more libraries
+- more folders
+- more patterns
+- more libraries
 
 Scalability usually comes from:
+- clarity
+- consistency
+- separation
+- predictable flows
+- responsibility boundaries
 
-* clarity
-* consistency
-* separation
-* predictable flows
-* responsibility boundaries
-
-The simpler developers can understand the system,
-the longer the project survives cleanly.
+The simpler developers can understand the system, the longer the project survives cleanly.
 
 ---
 
-# Final Thoughts
+## Final Thoughts
 
 Structuring large React applications is not about finding the "perfect architecture."
 
@@ -518,11 +462,8 @@ It's about creating systems that remain understandable as the product evolves.
 
 React itself is flexible enough for almost any scale.
 
-The difficult part is:
-
-# how developers organize complexity over time.
+The difficult part is **how developers organize complexity over time**.
 
 I've realized that the best frontend systems are usually the ones that reduce mental load.
 
-Because when projects grow,
-clarity becomes more valuable than cleverness.
+Because when projects grow, clarity becomes more valuable than cleverness.
