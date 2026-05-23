@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from "next/script";
 import { Outfit, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
@@ -72,6 +73,18 @@ export default function RootLayout({
       className={`${outfit.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
+      <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-F8L5JRCFQV"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-F8L5JRCFQV');
+          `}
+        </Script>
       <body className="min-h-screen flex flex-col bg-gradient-chai text-gray-900 antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>
