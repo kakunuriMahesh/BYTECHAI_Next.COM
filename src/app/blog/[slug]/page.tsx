@@ -60,6 +60,23 @@ const mdxComponents = {
     <img className="rounded-2xl w-full mb-6" loading="lazy" {...props} />
   ),
   hr: () => <hr className="my-12 border-gray-100" />,
+  table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+    <div className="overflow-x-auto mb-8 rounded-2xl border border-gray-100 shadow-sm">
+      <table className="w-full border-collapse bg-white text-sm" {...props} />
+    </div>
+  ),
+  thead: (props: React.HTMLAttributes<HTMLTableSectionElement>) => (
+    <thead className="bg-chai-light/40 border-b border-amber-200" {...props} />
+  ),
+  th: (props: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
+    <th className="px-5 py-3.5 text-left font-bold text-chai-dark text-xs uppercase tracking-wider" {...props} />
+  ),
+  tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => (
+    <tr className="border-b border-gray-100 last:border-b-0 hover:bg-amber-50/30 transition-colors" {...props} />
+  ),
+  td: (props: React.TdHTMLAttributes<HTMLTableDataCellElement>) => (
+    <td className="px-5 py-3.5 text-gray-700" {...props} />
+  ),
 }
 
 export async function generateStaticParams() {

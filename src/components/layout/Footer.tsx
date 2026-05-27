@@ -87,12 +87,9 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-start items-center gap-4">
           <p className="text-gray-400 text-[11px] font-medium tracking-wide">
             &copy; {currentYear} ByteChai. All rights reserved.
-          </p>
-          <p className="text-gray-400 text-[11px] font-medium tracking-wide flex items-center gap-1">
-            Made with <FaHeart className="text-chai" size={10} /> in Hyderabad
           </p>
         </div>
       </div>
