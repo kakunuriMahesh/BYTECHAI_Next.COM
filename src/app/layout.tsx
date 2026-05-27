@@ -85,7 +85,7 @@ export default function RootLayout({
             gtag('config', 'G-F8L5JRCFQV');
           `}
         </Script>
-      <body className="min-h-screen flex flex-col bg-gradient-chai text-gray-900 antialiased">
+      <body className="min-h-screen flex flex-col bg-gradient-chai text-gray-900 antialiased" suppressHydrationWarning>
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

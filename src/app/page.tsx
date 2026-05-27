@@ -7,6 +7,7 @@ import { Stats } from '@/components/home/Stats'
 import { Testimonials } from '@/components/home/Testimonials'
 import { ServicesSection } from '@/components/home/ServicesSection'
 import { Newsletter } from '@/components/home/Newsletter'
+import { ResumeFloatingButton } from '@/components/home/ResumeFloatingButton'
 import { getAllBlogPosts } from '@/lib/mdx'
 
 export default function HomePage() {
@@ -23,6 +24,7 @@ export default function HomePage() {
       <Testimonials />
       <ServicesSection />
       <Newsletter />
+      <ResumeFloatingButton />
     </>
   )
 }
